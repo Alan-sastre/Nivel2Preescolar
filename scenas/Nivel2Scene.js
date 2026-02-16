@@ -3,6 +3,10 @@ class Nivel2Scene extends Phaser.Scene {
     super({ key: "Nivel2Scene" });
   }
 
+  preload() {
+    this.load.audio("bgm_nivel2", "musica1.mp3");
+  }
+
   create() {
     this.width = this.cameras.main.width;
     this.height = this.cameras.main.height;
@@ -11,6 +15,8 @@ class Nivel2Scene extends Phaser.Scene {
 
     // Background
     this.createBackground();
+
+    this.audioManager = new AudioManager(this, "bgm_nivel2");
 
     // Robot Container
     this.robot = new Robot(this, this.width / 2, this.height / 2 + 30);
@@ -609,37 +615,112 @@ class Nivel2Scene extends Phaser.Scene {
     this.clearUI();
     if (this.guideText) this.guideText.setText("¡ROBOT ACTIVADO!");
 
-    // Contenedor para la celebración
     const finishUI = this.add.container(0, 0).setDepth(1000);
 
-    // Fondo semitransparente
-    const overlay = this.add.rectangle(
-      this.width / 2,
-      this.height / 2,
-      this.width,
-      this.height,
-      0x000000,
-      0.6,
+    const overlay = this.add
+      .rectangle(
+        this.width / 2,
+        this.height / 2,
+        this.width,
+        this.height,
+        0x000000,
+        0.7,
+      )
+      .setDepth(0);
+
+    const panelBg = this.add.graphics();
+    panelBg.fillStyle(0x001b2f, 0.95);
+    panelBg.fillRoundedRect(
+      this.width / 2 - 230,
+      this.height / 2 - 170,
+      460,
+      320,
+      26,
+    );
+    panelBg.lineStyle(4, 0x00ffff, 0.8);
+    panelBg.strokeRoundedRect(
+      this.width / 2 - 230,
+      this.height / 2 - 170,
+      460,
+      320,
+      26,
     );
 
-    // Panel central
-    const panel = this.add
-      .rectangle(this.width / 2, this.height / 2, 400, 300, 0xffffff)
-      .setStrokeStyle(10, 0x00ffff);
+    const panelGlow = this.add
+      .ellipse(this.width / 2, this.height / 2 + 40, 380, 160, 0x00ffff, 0.08)
+      .setStrokeStyle(2, 0x00ffff, 0.2);
+
+    const trophyGlow = this.add
+      .circle(this.width / 2, this.height / 2 - 60, 70, 0x00ffff, 0.15)
+      .setStrokeStyle(2, 0x00ffff, 0.5);
 
     const trophy = this.add
-      .text(this.width / 2, this.height / 2 - 50, "🏆", { fontSize: "120px" })
+      .text(this.width / 2, this.height / 2 - 70, "🏆", { fontSize: "120px" })
       .setOrigin(0.5);
 
     const congratsText = this.add
-      .text(this.width / 2, this.height / 2 + 70, "¡LO LOGRASTE!", {
+      .text(this.width / 2, this.height / 2 + 40, "¡LO LOGRASTE!", {
         fontSize: "45px",
         fontFamily: "Arial Black",
-        fill: "#2c3e50",
+        fill: "#eaf6ff",
+        stroke: "#00334d",
+        strokeThickness: 4,
       })
       .setOrigin(0.5);
 
-    finishUI.add([overlay, panel, trophy, congratsText]);
+    const replayContainer = this.add
+      .container(this.width / 2, this.height / 2 + 125)
+      .setDepth(10);
+    const replayBtn = this.add
+      .rectangle(0, 0, 280, 72, 0x00e0c0, 1)
+      .setStrokeStyle(4, 0x005b7f);
+    const replayIcon = this.add.text(-78, 0, "", {
+      fontSize: "32px",
+    });
+    replayIcon.setOrigin(0.5);
+    const replayText = this.add.text(22, 0, "VOLVER A JUGAR", {
+      fontSize: "26px",
+      fontFamily: "Arial Black",
+      fill: "#00334d",
+    });
+    replayText.setOrigin(0.5);
+    replayContainer.add([replayBtn, replayIcon, replayText]);
+
+    replayBtn.setInteractive({ useHandCursor: true });
+    replayBtn.on("pointerover", () => {
+      this.tweens.add({
+        targets: replayContainer,
+        scale: 1.06,
+        duration: 140,
+        ease: "Back.easeOut",
+      });
+      replayBtn.setFillStyle(0xffffff);
+      replayText.setColor("#007a66");
+    });
+    replayBtn.on("pointerout", () => {
+      this.tweens.add({
+        targets: replayContainer,
+        scale: 1,
+        duration: 160,
+        ease: "Back.easeOut",
+      });
+      replayBtn.setFillStyle(0x00e0c0);
+      replayText.setColor("#00334d");
+    });
+    replayBtn.on("pointerdown", () => {
+      this.cameras.main.flash(200, 0, 255, 255);
+      this.scene.restart();
+    });
+
+    finishUI.add([
+      overlay,
+      panelBg,
+      panelGlow,
+      trophyGlow,
+      trophy,
+      congratsText,
+      replayContainer,
+    ]);
 
     // Animación de entrada
     finishUI.setAlpha(0).setScale(0.8);

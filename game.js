@@ -27,7 +27,7 @@ const config = {
     batchSize: 2000,
     willReadFrequently: false // Desactivado si usamos WebGL (Phaser.AUTO)
   },
-  scene: [MenuScene, ContextoScene, Nivel2Scene, MinijuegoScene],
+  scene: [Nivel2Scene, ContextoScene, MinijuegoScene],
 };
 
 // Crear el contenedor del juego
