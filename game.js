@@ -2,8 +2,8 @@ function isMobile() {
   return /Android|iPhone|iPad|iPod|Windows Phone/i.test(navigator.userAgent);
 }
 
-var config = {
-  type: Phaser.AUTO,
+const config = {
+  type: Phaser.AUTO, // Intentará usar WebGL primero, lo cual evita problemas de Canvas2D
   scale: {
     mode: Phaser.Scale.FIT,
     parent: "game",
@@ -19,17 +19,15 @@ var config = {
     },
   },
   render: {
-    pixelArt: true,
+    pixelArt: false,
     antialias: true,
-    roundPixels: true,
-    willReadFrequently: true,
-    enableWebGL: true,
+    roundPixels: true, // Cambiado a true para evitar jittering de subpíxeles
+    clearBeforeRender: true,
+    preserveDrawingBuffer: false, // Desactivado para evitar parpadeos de buffer en Chrome/Edge
+    batchSize: 2000,
+    willReadFrequently: false // Desactivado si usamos WebGL (Phaser.AUTO)
   },
-  scene: [
-    ContextoScene,
-    MinijuegoScene,
-  ],
-
+  scene: [MenuScene, ContextoScene, Nivel2Scene, MinijuegoScene],
 };
 
 // Crear el contenedor del juego
